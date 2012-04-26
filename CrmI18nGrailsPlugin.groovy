@@ -22,7 +22,7 @@ class CrmI18nGrailsPlugin {
     def groupId = "grails.crm"
     def version = "0.9.0"
     def grailsVersion = "2.0 > *"
-    def dependsOn = [crmCore:"0.9.0 > *"]
+    def dependsOn = [:]
     def pluginExcludes = [
             "grails-app/views/error.gsp"
     ]
