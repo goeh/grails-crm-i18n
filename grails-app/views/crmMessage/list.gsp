@@ -50,7 +50,7 @@
 </table>
 
 <div class="pagination">
-    <bootstrap:paginate total="${crmMessageTotal}"/>
+    <g:paginate total="${crmMessageTotal}"/>
 </div>
 </body>
 </html>

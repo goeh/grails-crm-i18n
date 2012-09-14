@@ -29,7 +29,7 @@
         <fieldset>
             <f:with bean="crmMessage">
                 <f:field property="code"/>
-                <f:field property="locale"><crm:localeSelect name="locale" value="${crmMessage.locale}"
+                <f:field property="locale"><g:localeSelect name="locale" value="${crmMessage.locale}"
                                                              noSelection="['':'']"/></f:field>
                 <f:field property="text"><g:textArea name="text" cols="70" rows="3" class="span6" autofocus=""
                                                      value="${crmMessage.text}"/></f:field>
