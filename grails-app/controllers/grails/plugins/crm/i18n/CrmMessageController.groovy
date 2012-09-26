@@ -1,59 +1,69 @@
 /*
- *  Copyright 2012 Goran Ehrsson.
+ * Copyright 2012 Goran Ehrsson.
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *  under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package grails.plugins.crm.i18n
 
 import grails.plugins.crm.core.TenantUtils
+import grails.plugins.crm.core.WebUtils
+import org.apache.commons.lang.LocaleUtils
 
 class CrmMessageController {
 
-    static allowedMethods = [create: ['GET', 'POST'], edit: ['GET', 'POST'], delete: 'POST']
+    static allowedMethods = [index: ['GET', 'POST'], create: ['GET', 'POST'], edit: ['GET', 'POST'], delete: 'POST']
 
     static navigation = [
+            [group: 'admin',
+                    order: 980,
+                    title: 'crmMessage.index.label',
+                    action: 'index'
+            ],
             [group: 'crmAdmin',
                     order: 980,
-                    title: 'crmMessage.label',
-                    action: 'list'
-            ],
-            [group: 'crmMessage',
-                    order: 20,
-                    title: 'crmMessage.create.label',
-                    action: 'create',
-                    isVisible: { actionName != 'create' }
-            ],
-            [group: 'crmMessage',
-                    order: 30,
                     title: 'crmMessage.list.label',
-                    action: 'list',
-                    isVisible: { actionName != 'list' }
-            ],
-            [group: 'crmMessage',
-                    order: 40,
-                    title: 'crmMessage.export.label',
-                    action: 'export',
-                    isVisible: { actionName == 'list' }
+                    action: 'list'
             ]
     ]
 
-    def grailsApplication
     def crmMessageService
 
     def index = {
-        redirect(action: "list", params: params)
+        def locale = params.lang ? LocaleUtils.toLocale(params.lang) : null
+        def properties = new Properties()
+        switch (request.method) {
+            case 'GET':
+                if (locale) {
+                    request.session.crmMessageAdminLocale = locale
+                }
+                break
+            case 'POST':
+                request.session.crmMessageAdminLocale = locale
+                int count = 0
+                params.findAll{it.key.startsWith('properties.')}.each{key, value->
+                    if(value) {
+                        // TODO Figure out how to only update texts that has been modified by user.
+                        // This if statement makes it impossible to save a text as blank.
+                        properties.setProperty(key[11..-1], value)
+                        count++
+                    }
+                }
+                properties = crmMessageService.updateProperties(properties, locale)
+                flash.success = message(code: 'crmMessage.all.updated.message', args: [message(code: 'crmMessage.label', default: 'Message'), count.toString()])
+                break
+        }
+        return [properties: properties, locale:locale]
     }
 
     def list = {
@@ -74,7 +84,9 @@ class CrmMessageController {
                     return
                 }
 
-                flash.message = message(code: 'default.created.message', args: [message(code: 'crmMessage.label', default: 'Message'), crmMessage.toString()])
+                crmMessageService.removeFromCache(crmMessage)
+
+                flash.success = message(code: 'crmMessage.created.message', args: [message(code: 'crmMessage.label', default: 'Message'), crmMessage.toString()])
                 redirect action: 'list'
                 break
         }
@@ -85,7 +97,7 @@ class CrmMessageController {
             case 'GET':
                 def crmMessage = CrmMessage.get(params.id)
                 if (!crmMessage) {
-                    flash.message = message(code: 'default.not.found.message', args: [message(code: 'crmMessage.label', default: 'Message'), params.id])
+                    flash.error = message(code: 'crmMessage.not.found.message', args: [message(code: 'crmMessage.label', default: 'Message'), params.id])
                     redirect action: 'list'
                     return
                 }
@@ -95,7 +107,7 @@ class CrmMessageController {
             case 'POST':
                 def crmMessage = CrmMessage.get(params.id)
                 if (!crmMessage) {
-                    flash.message = message(code: 'default.not.found.message', args: [message(code: 'crmMessage.label', default: 'Message'), params.id])
+                    flash.error = message(code: 'crmMessage.not.found.message', args: [message(code: 'crmMessage.label', default: 'Message'), params.id])
                     redirect action: 'list'
                     return
                 }
@@ -120,7 +132,7 @@ class CrmMessageController {
 
                 crmMessageService.removeFromCache(crmMessage)
 
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'crmMessage.label', default: 'Message'), crmMessage.toString()])
+                flash.success = message(code: 'crmMessage.updated.message', args: [message(code: 'crmMessage.label', default: 'Message'), crmMessage.toString()])
                 redirect action: 'list'
                 break
         }
@@ -132,7 +144,7 @@ class CrmMessageController {
             try {
                 def tmp = crmMessage.toString()
                 crmMessage.delete(flush: true)
-                flash.message = "${message(code: 'crmMessage.deleted.message', args: [message(code: 'crmMessage.label', default: 'Message'), tmp])}"
+                flash.warning = "${message(code: 'crmMessage.deleted.message', args: [message(code: 'crmMessage.label', default: 'Message'), tmp])}"
                 redirect(action: "list")
             }
             catch (org.springframework.dao.DataIntegrityViolationException e) {
@@ -147,30 +159,35 @@ class CrmMessageController {
     }
 
     def export() {
-        def zipFile = crmMessageService.export()
-        if (zipFile?.exists()) {
+        def file = crmMessageService.exportToFile()
+        if (file?.exists()) {
             try {
-                def filename = grailsApplication.metadata['app.name'] ?: 'i18n'
-                response.setHeader("Content-disposition", "attachment; filename=${filename}.zip")
-                response.contentType = "application/zip"
-                response.characterEncoding = "UTF-8"
-                response.setContentLength(zipFile.length().intValue())
-                response.setHeader("Pragma", "")
-                response.setHeader("Cache-Control", "private,no-store,max-age=120")
-                Calendar cal = Calendar.getInstance()
-                cal.add(Calendar.MINUTE, 2)
-                response.setDateHeader("Expires", cal.getTimeInMillis())
-
-                def out = response.outputStream
-                zipFile.withInputStream {is ->
-                    out << is
-                }
-                out.flush()
+                def fileName = file.name
+                def contentType = fileName.endsWith(".zip") ? 'application/zip' : 'text/plain'
+                WebUtils.attachmentHeaders(response, contentType, fileName)
+                WebUtils.renderFile(response, file)
             } finally {
-                zipFile.delete()
+                file.delete()
             }
         } else {
-            redirect action: 'list'
+            flash.error = message(code: "crmMessage.export.error", default: "Failed to export")
+            redirect action: 'index'
         }
+    }
+
+    def upload() {
+        def fileItem = request.getFile("file")
+        if (fileItem?.isEmpty()) {
+            flash.error = message(code: "crmMessage.upload.empty", default: "You must select a file to import")
+        } else if (fileItem) {
+            try {
+                crmMessageService.importText(fileItem.inputStream)
+                flash.success = message(code: "crmMessage.upload.success", args: [fileItem.originalFilename], default: "Texts imported from {0}")
+            } catch (Exception e) {
+                log.error("Failed to import: ${fileItem.originalFilename}", e)
+                flash.error = message(code: "crmMessage.upload.error", args: [fileItem.originalFilename], default: "Failed to import {0}")
+            }
+        }
+        redirect action: "index"
     }
 }

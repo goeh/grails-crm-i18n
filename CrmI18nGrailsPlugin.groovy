@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012 Goran Ehrsson.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.apache.commons.lang.StringUtils
 import org.codehaus.groovy.grails.cli.logging.GrailsConsoleAntBuilder
 import grails.util.BuildSettingsHolder
@@ -9,7 +25,6 @@ import org.codehaus.groovy.grails.web.pages.GroovyPagesTemplateEngine
 import org.codehaus.groovy.grails.web.context.GrailsConfigUtils
 import grails.util.Environment
 import org.apache.commons.logging.LogFactory
-import grails.util.GrailsUtil
 import grails.plugins.crm.i18n.CrmMessageSource
 
 class CrmI18nGrailsPlugin {
@@ -54,10 +69,6 @@ If you're not using Grails CRM please use i18n-db instead.
 
     // Online location of the plugin's browseable source code.
     def scm = [url: "https://github.com/goeh/grails-crm-i18n/"]
-
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before
-    }
 
     def doWithSpring = {
         // find i18n resource bundles and resolve basenames
@@ -125,10 +136,6 @@ If you're not using Grails CRM please use i18n-db instead.
         localeResolver(SessionLocaleResolver)
     }
 
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
     def doWithApplicationContext = { applicationContext ->
                if (!applicationContext.containsBean('messageCache')) {
             LOG.warn("Please configure bean 'messageCache' to speed up i18n message lookups from database.")
@@ -170,14 +177,5 @@ If you're not using Grails CRM please use i18n-db instead.
         else {
             LOG.warn "Bean messageSource is not an instance of ${ReloadableResourceBundleMessageSource.name}. Can't reload"
         }
-    }
-
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
     }
 }

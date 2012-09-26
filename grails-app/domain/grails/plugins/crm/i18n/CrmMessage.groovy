@@ -31,7 +31,7 @@ class CrmMessage {
 
     static constraints = {
         code(maxSize:100, blank:false)
-        locale(maxSize:10, nullable:true)
+        locale(maxSize:10, nullable:true, blank: false)
         text(maxSize:255)
     }
     static mapping = {

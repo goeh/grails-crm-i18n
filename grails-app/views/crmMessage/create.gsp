@@ -1,5 +1,5 @@
 <%@ page import="grails.plugins.crm.i18n.CrmMessage" %>
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -10,14 +10,14 @@
 <body>
 
 <g:hasErrors bean="${crmMessage}">
-    <bootstrap:alert class="alert-error">
+    <crm:alert class="alert-error">
         <ul>
             <g:eachError bean="${crmMessage}" var="error">
                 <li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message
                         error="${error}"/></li>
             </g:eachError>
         </ul>
-    </bootstrap:alert>
+    </crm:alert>
 </g:hasErrors>
 
 <crm:header title="crmMessage.create.title" args="[entityName]"/>

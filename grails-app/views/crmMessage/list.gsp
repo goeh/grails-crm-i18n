@@ -1,5 +1,5 @@
 <%@ page import="grails.plugins.crm.i18n.CrmMessage" %>
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -14,43 +14,40 @@
 <table class="table table-striped">
     <thead>
     <tr>
-
-        <g:sortableColumn property="code"
-                          title="${message(code: 'crmMessage.code.label', default: 'Code')}"/>
-
-        <g:sortableColumn property="locale"
-                          title="${message(code: 'crmMessage.locale.label', default: 'Locale')}"/>
-
-        <g:sortableColumn property="text"
-                          title="${message(code: 'crmMessage.text.label', default: 'Text')}"/>
-
+        <crm:sortableColumn property="code"
+                            title="${message(code: 'crmMessage.code.label', default: 'Code')}"/>
+        <crm:sortableColumn property="locale"
+                            title="${message(code: 'crmMessage.locale.label', default: 'Locale')}"/>
+        <crm:sortableColumn property="text"
+                            title="${message(code: 'crmMessage.text.label', default: 'Text')}"/>
     </tr>
     </thead>
     <tbody>
     <g:each in="${crmMessageList}" var="crmMessage">
         <tr>
-
             <td>
                 <g:link action="edit" id="${crmMessage.id}">
                     ${fieldValue(bean: crmMessage, field: "code")}
                 </g:link>
             </td>
-
             <td>
                 ${fieldValue(bean: crmMessage, field: "locale")}
             </td>
-
             <td>
                 ${fieldValue(bean: crmMessage, field: "text")}
             </td>
-
         </tr>
     </g:each>
     </tbody>
 </table>
 
-<div class="pagination">
-    <g:paginate total="${crmMessageTotal}"/>
+<crm:paginate total="${crmMessageTotal}"/>
+
+<div class="form-actions">
+    <crm:button type="link" action="create" visual="success" icon="icon-file icon-white"
+                label="crmMessage.create.label" permission="crmMessage:create"/>
+    <crm:button type="link" action="index" icon="icon-font" label="crmMessage.index.label"/>
 </div>
+
 </body>
 </html>
