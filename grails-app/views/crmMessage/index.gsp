@@ -58,7 +58,7 @@
             <li class="active"><a href="#main" data-toggle="tab"><g:message code="crmMessage.tab.main.label"/></a></li>
             <crm:pluginViews location="tabs" var="view">
                 <li>
-                    <a href="#${view.id}" data-toggle="tab">${view.label.encodeAsHTML()}</a>
+                    <a href="#${view.id}" data-toggle="tab">${message(code: view.label, default: view.label)}</a>
                 </li>
             </crm:pluginViews>
         </ul>
@@ -69,42 +69,15 @@
                 <div class="row-fluid">
                     <div class="span6">
                         <div class="row-fluid">
-                            <div class="control-group">
-                                <label class="control-label">Application name</label>
-
-                                <div class="controls">
-                                    <g:textField name="properties.app.name" value="${properties['app.name']}"
-                                                 placeholder="${message(code: 'app.name', default: '')}"
-                                                 class="span10"/>
-                                </div>
-                            </div>
+                            <crm:i18nAdminField key="app.name" label="Application name"/>
                         </div>
 
                     </div>
 
                     <div class="span6">
                         <div class="row-fluid">
-                            <div class="control-group">
-                                <label class="control-label">Error header</label>
-
-                                <div class="controls">
-                                    <g:textField name="properties.exception.title"
-                                                 value="${properties['exception.title']}"
-                                                 placeholder="${message(code: 'exception.title', default: '')}"
-                                                 class="span10"/>
-                                </div>
-                            </div>
-
-                            <div class="control-group">
-                                <label class="control-label">Error instructions</label>
-
-                                <div class="controls">
-                                    <g:textField name="properties.exception.subtitle"
-                                                 value="${properties['exception.subtitle']}"
-                                                 placeholder="${message(code: 'exception.subtitle', default: '')}"
-                                                 class="span10"/>
-                                </div>
-                            </div>
+                            <crm:i18nAdminField key="exception.title" label="Error header"/>
+                            <crm:i18nAdminField key="exception.subtitle" label="Error instructions"/>
                         </div>
                     </div>
                 </div>
