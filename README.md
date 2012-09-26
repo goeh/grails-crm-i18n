@@ -15,6 +15,9 @@ With CRM we mean features like:
 This plugin provides storage of i18n messages in the database.
 It is a clone of the *i18n-db* plugin customized for Grails CRM and tenant aware.
 
+An admin UI is provided at <app-name>/crmMessage where you can add messages to the database that will override
+messages defined in property files.
+
 The plugin also has special fallback logic when it looks up messages.
 Example: If the specified key is `crmContact.button.save` it tries to find messages using the following keys:
 
@@ -25,9 +28,6 @@ Example: If the specified key is `crmContact.button.save` it tries to find messa
 3. default.button.save
 4. default.button.save.label
 5. calls standard Spring message source using original key (crmContact.button.save)
-
-An admin UI is provided at <app-name>/crmMessage where you can add messages to the database that will override
-messages defined in property files.
 
 The plugin can use EhCache to cache messages retrieved from database (recommended).
 To enable caching, configure a bean named "messageCache" in resources.groovy
