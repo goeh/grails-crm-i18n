@@ -1,4 +1,3 @@
-<%@ page import="grails.plugins.crm.i18n.CrmMessage" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +32,7 @@
                                                      value="${crmMessage.text}"/></f:field>
             </f:with>
             <div class="form-actions">
-                <crm:button visual="primary" icon="icon-ok icon-white" label="crmMessage.button.create.label"/>
+                <crm:button visual="success" icon="icon-ok icon-white" label="crmMessage.button.create.label"/>
             </div>
         </fieldset>
     </g:form>

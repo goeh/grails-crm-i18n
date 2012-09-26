@@ -1,4 +1,3 @@
-<%@ page import="grails.plugins.crm.i18n.CrmMessage" %>
 <!DOCTYPE html>
 <html>
 <head>

@@ -50,6 +50,18 @@
             <p class="lead"><g:message code="crmMessage.index.message" default="Change system messages."/>
             </p>
         </div>
+
+        <div class="span5">
+            <div class="row-fluid form-horizontal">
+                <div class="control-group">
+                    <div class="control-label"><g:message code="crmMessage.locale.label" default="Locale"/></div>
+
+                    <div class="controls">
+                        <g:localeSelect name="lang" id="locale" value="${locale}" noSelection="['': '']" class="span11"/>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="tabbable">
@@ -93,16 +105,8 @@
 
     </div>
 
-    <div class="control-group">
-        <div class="control-label"><g:message code="crmMessage.locale.label" default="Locale"/></div>
-
-        <div class="controls">
-            <g:localeSelect name="lang" id="locale" value="${locale}" noSelection="['': '']"/>
-        </div>
-    </div>
-
     <div class="form-actions">
-        <crm:button action="index" visual="primary" icon="icon-ok icon-white" label="crmMessage.button.update.label"/>
+        <crm:button action="index" visual="success" icon="icon-ok icon-white" label="crmMessage.button.update.label"/>
         <crm:button type="link" action="create" visual="success" icon="icon-file icon-white"
                     label="crmMessage.create.label" permission="crmMessage:create"/>
         <crm:button type="link" action="list" icon="icon-list-alt"
