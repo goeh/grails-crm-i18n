@@ -57,7 +57,8 @@
                     <div class="control-label"><g:message code="crmMessage.locale.label" default="Locale"/></div>
 
                     <div class="controls">
-                        <g:localeSelect name="lang" id="locale" value="${locale}" noSelection="['': '']" class="span11"/>
+                        <g:localeSelect name="lang" id="locale" value="${locale}" noSelection="['': '']"
+                                        class="span11"/>
                     </div>
                 </div>
             </div>
@@ -69,9 +70,7 @@
         <ul class="nav nav-tabs">
             <li class="active"><a href="#main" data-toggle="tab"><g:message code="crmMessage.tab.main.label"/></a></li>
             <crm:pluginViews location="tabs" var="view">
-                <li>
-                    <a href="#${view.id}" data-toggle="tab">${message(code: view.label, default: view.label)}</a>
-                </li>
+                <crm:pluginTab id="${view.id}" label="${view.label}" count="${view.model?.totalCount}"/>
             </crm:pluginViews>
         </ul>
 
@@ -97,7 +96,7 @@
             </div>
 
             <crm:pluginViews location="tabs" var="view">
-                <div class="tab-pane" id="${view.id}">
+                <div class="tab-pane tab-${view.id}" id="${view.id}">
                     <g:render template="${view.template}" model="${view.model}" plugin="${view.plugin}"/>
                 </div>
             </crm:pluginViews>
