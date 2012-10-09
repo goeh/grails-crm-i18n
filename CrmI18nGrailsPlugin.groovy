@@ -35,7 +35,7 @@ class CrmI18nGrailsPlugin {
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
     def groupId = "grails.crm"
-    def version = "1.0-SNAPSHOT"
+    def version = "1.0"
     def grailsVersion = "2.0 > *"
     def dependsOn = [:]
     def pluginExcludes = [
