@@ -18,8 +18,6 @@
 package grails.plugins.crm.i18n
 
 import java.text.MessageFormat
-import net.sf.ehcache.Ehcache
-import net.sf.ehcache.Element
 import org.codehaus.groovy.grails.context.support.PluginAwareResourceBundleMessageSource
 
 import grails.plugins.crm.core.TenantUtils
@@ -32,31 +30,41 @@ import org.apache.commons.logging.LogFactory
  */
 class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
 
+    public static final String CRM_MESSAGE_CACHE = 'crmMessageCache'
+
     private static LOG = LogFactory.getLog(CrmMessageSource)
 
-    Ehcache messageCache
+    def grailsCacheManager
 
     @Override
     protected MessageFormat resolveCode(String code, Locale locale) {
         def tenant = TenantUtils.getTenant()
-        def key = new MessageKey(tenant, code, locale)
-        def format = messageCache?.get(key)?.value
+        def key = tenant.toString() + code + locale.toString()
+        def messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
+        def format = messageCache?.get(key)?.get()
+        if (format == Boolean.FALSE) {
+            return null
+        }
         if (format == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug('- ' + code)
+            if (LOG.isDebugEnabled() && (messageCache != null)) {
+                LOG.debug('1 - ' + key)
             }
-            format = findCode(code, locale, tenant) {a, l ->
+            format = findCode(code, locale, tenant) { a, l ->
                 super.resolveCode(a, l)
             }
-            if (format != null && messageCache != null) {
-                messageCache.put(new Element(key, format))
+            if (messageCache != null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug('1 > ' + key)
+                }
+                messageCache.put(key, format != null ? format : Boolean.FALSE)
             }
         } else if (!(format instanceof MessageFormat)) {
             format = new MessageFormat(format.toString(), locale)
-            if (LOG.isDebugEnabled()) {
-                LOG.debug('! ' + code)
-            } else if (LOG.isDebugEnabled()) {
-                LOG.debug('+ ' + code)
+            if (messageCache != null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug('1 ! ' + key)
+                }
+                messageCache.put(key, format)
             }
         }
         return format
@@ -65,20 +73,25 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
     @Override
     protected String resolveCodeWithoutArguments(String code, Locale locale) {
         def tenant = TenantUtils.getTenant()
-        def key = new MessageKey(tenant, code, locale)
-        def format = messageCache?.get(key)?.value
+        def key = tenant.toString() + code + locale.toString()
+        def messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
+        def format = messageCache?.get(key)?.get()
+        if (format == Boolean.FALSE) {
+            return null
+        }
         if (format == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug('- ' + code)
+            if (LOG.isDebugEnabled() && (messageCache != null)) {
+                LOG.debug('2 - ' + key)
             }
-            format = findCode(code, locale, tenant) {a, l ->
+            format = findCode(code, locale, tenant) { a, l ->
                 super.resolveCodeWithoutArguments(a, l)
             }
-            if (format != null && messageCache != null) {
-                messageCache.put(new Element(key, format))
+            if (messageCache != null) {
+                LOG.debug('2 > ' + key)
+                messageCache.put(key, format != null ? format : Boolean.FALSE)
             }
-        } else if (LOG.isDebugEnabled()) {
-            LOG.debug('+ ' + code)
+        } else if (LOG.isDebugEnabled() && (messageCache != null)) {
+            LOG.debug('2 + ' + key)
         }
         return (format instanceof MessageFormat) ? format.toPattern() : format
     }
@@ -100,6 +113,10 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
         }
 
         def result = CrmMessage.withCriteria {
+            projections {
+                property('code')
+                property('text')
+            }
             eq('tenantId', tenant)
             inList('code', alternatives)
             or {
@@ -108,13 +125,14 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
                 isNull('locale')
             }
             order('locale', 'desc')
+            cache true
         }
 
         // If multiple result, make sure we return the most wanted message.
         def format
         for (alt in alternatives) {
-            def msg = result.find {it.code == alt}
-            format = msg ? new MessageFormat(msg.text, locale) : fallback(alt, locale)
+            def msg = result.find { it[0] == alt }
+            format = msg ? new MessageFormat(msg[1], locale) : fallback(alt, locale)
             if (format != null) {
                 break
             }

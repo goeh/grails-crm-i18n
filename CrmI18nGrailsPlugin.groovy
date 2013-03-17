@@ -35,7 +35,7 @@ class CrmI18nGrailsPlugin {
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
     def groupId = "grails.crm"
-    def version = "1.0"
+    def version = "1.1-SNAPSHOT"
     def grailsVersion = "2.0 > *"
     def dependsOn = [:]
     def pluginExcludes = [
@@ -50,24 +50,10 @@ This plugin is based on the 'i18n-db' plugin and adds Grails CRM multi-tenancy s
 If you're not using Grails CRM please use i18n-db instead.
 '''
 
-    // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/crm-i18n"
-
-    // Extra (optional) plugin metadata
-
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
     def license = "APACHE"
-
-    // Details of company behind the plugin (if there is one)
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
-
-    // Any additional developers beyond the author specified above.
-    //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
-
-    // Location of the plugin's issue tracker.
-    def issueManagement = [system: "GITHUB", url: "https://github.com/goeh/grails-crm-i18n/issues"]
-
-    // Online location of the plugin's browseable source code.
+    def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-i18n/issues"]
     def scm = [url: "https://github.com/goeh/grails-crm-i18n/"]
 
     def doWithSpring = {
@@ -124,8 +110,10 @@ If you're not using Grails CRM please use i18n-db instead.
                 if (cacheSecondsSetting != null) {
                     cacheSeconds = cacheSecondsSetting as Integer
                 } else {
-                    cacheSeconds = 5
+                    cacheSeconds = 10
                 }
+            } else {
+                cacheSeconds = 600
             }
         }
 
