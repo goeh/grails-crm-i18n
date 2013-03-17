@@ -30,9 +30,9 @@ class CrmMessage {
     String text
 
     static constraints = {
-        code(maxSize:100, blank:false)
+        code(maxSize:100, blank:false, unique: ['tenantId', 'locale'])
         locale(maxSize:10, nullable:true, blank: false)
-        text(maxSize:255)
+        text(maxSize:800)
     }
     static mapping = {
         cache usage:'nonstrict-read-write'
