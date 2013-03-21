@@ -1,7 +1,7 @@
 import grails.plugins.crm.i18n.CrmMessage
 import grails.plugins.crm.i18n.CrmMessageSource
 
-grails.cache.config = {
+config = {
     cache {
         name CrmMessageSource.CRM_MESSAGE_CACHE // 'crmMessageCache'
         eternal false
