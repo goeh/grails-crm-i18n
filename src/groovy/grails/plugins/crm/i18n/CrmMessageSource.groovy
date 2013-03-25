@@ -49,7 +49,7 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
             if (LOG.isDebugEnabled() && (messageCache != null)) {
                 LOG.debug('1 - ' + key)
             }
-            format = findCode(code, locale, tenant) { a, l ->
+            format = findCode(code, locale, tenant) { String a, Locale l ->
                 super.resolveCode(a, l)
             }
             if (messageCache != null) {
@@ -83,7 +83,7 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
             if (LOG.isDebugEnabled() && (messageCache != null)) {
                 LOG.debug('2 - ' + key)
             }
-            format = findCode(code, locale, tenant) { a, l ->
+            format = findCode(code, locale, tenant) { String a, Locale l ->
                 super.resolveCodeWithoutArguments(a, l)
             }
             if (messageCache != null) {
@@ -113,10 +113,6 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
         }
 
         def result = CrmMessage.withCriteria {
-            projections {
-                property('code')
-                property('text')
-            }
             eq('tenantId', tenant)
             inList('code', alternatives)
             or {
@@ -131,8 +127,8 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
         // If multiple result, make sure we return the most wanted message.
         def format
         for (alt in alternatives) {
-            def msg = result.find { it[0] == alt }
-            format = msg ? new MessageFormat(msg[1], locale) : fallback(alt, locale)
+            def msg = result.find { it.code == alt }
+            format = msg ? new MessageFormat(msg.text, locale) : fallback.call(alt, locale)
             if (format != null) {
                 break
             }
