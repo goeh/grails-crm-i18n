@@ -35,7 +35,7 @@ class CrmI18nGrailsPlugin {
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
     def groupId = "grails.crm"
-    def version = "1.1.3"
+    def version = "1.1.4"
     def grailsVersion = "2.0 > *"
     def dependsOn = [:]
     def pluginExcludes = [
@@ -125,9 +125,6 @@ If you're not using Grails CRM please use i18n-db instead.
     }
 
     def doWithApplicationContext = { applicationContext ->
-               if (!applicationContext.containsBean('messageCache')) {
-            LOG.warn("Please configure bean 'messageCache' to speed up i18n message lookups from database.")
-        }
     }
 
     def onChange = { event ->
