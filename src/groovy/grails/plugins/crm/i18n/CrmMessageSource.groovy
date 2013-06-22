@@ -17,6 +17,9 @@
 
 package grails.plugins.crm.i18n
 
+import org.apache.commons.logging.Log
+import org.springframework.cache.Cache
+
 import java.text.MessageFormat
 import org.codehaus.groovy.grails.context.support.PluginAwareResourceBundleMessageSource
 
@@ -32,15 +35,15 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
 
     public static final String CRM_MESSAGE_CACHE = 'crmMessageCache'
 
-    private static LOG = LogFactory.getLog(CrmMessageSource)
+    private static final Log LOG = LogFactory.getLog(CrmMessageSource)
 
     def grailsCacheManager
 
     @Override
     protected MessageFormat resolveCode(String code, Locale locale) {
-        def tenant = TenantUtils.getTenant()
-        def key = tenant.toString() + code + locale.toString()
-        def messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
+        final Long tenant = TenantUtils.getTenant()
+        final String key = tenant.toString() + code + locale.toString()
+        final Cache messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
         def format = messageCache?.get(key)?.get()
         if (format == Boolean.FALSE) {
             return null
@@ -72,9 +75,9 @@ class CrmMessageSource extends PluginAwareResourceBundleMessageSource {
 
     @Override
     protected String resolveCodeWithoutArguments(String code, Locale locale) {
-        def tenant = TenantUtils.getTenant()
-        def key = tenant.toString() + code + locale.toString()
-        def messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
+        final Long tenant = TenantUtils.getTenant()
+        final String key = tenant.toString() + code + locale.toString()
+        final Cache messageCache = grailsCacheManager.getCache(CRM_MESSAGE_CACHE)
         def format = messageCache?.get(key)?.get()
         if (format == Boolean.FALSE) {
             return null
