@@ -16,12 +16,15 @@
 
 package grails.plugins.crm.i18n
 
+import groovy.transform.CompileStatic
+
 /**
  *
  * @author Goran Ehrsson
  * @since 0.1
  */
 //@Immutable
+@CompileStatic
 final class MessageKey implements Serializable {
     final Long tenant
     final String code
