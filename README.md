@@ -1,8 +1,8 @@
-# Grails CRM
+# GR8 CRM
 
 CRM = [Customer Relationship Management](http://en.wikipedia.org/wiki/Customer_relationship_management)
 
-Grails CRM is a set of [Grails Web Application Framework](http://www.grails.org/)
+GR8 CRM is a set of [Grails Web Application Framework](http://www.grails.org/)
 plugins that makes it easy to develop web application with CRM functionality.
 With CRM we mean features like:
 
@@ -13,7 +13,7 @@ With CRM we mean features like:
 #Store i18n messages in database
 
 This plugin provides storage of i18n messages in the database.
-It is a clone of the *i18n-db* plugin customized for Grails CRM and tenant aware.
+It is a clone of the *i18n-db* plugin customized for GR8 CRM and tenant aware.
 
 An admin UI is provided at <app-name>/crmMessage where you can add messages to the database that will override
 messages defined in property files.
