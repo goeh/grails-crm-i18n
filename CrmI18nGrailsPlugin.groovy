@@ -42,13 +42,13 @@ class CrmI18nGrailsPlugin {
     def pluginExcludes = [
             "grails-app/views/error.gsp"
     ]
-    def title = "Grails CRM Dynamic i18n"
+    def title = "GR8 CRM Dynamic i18n"
     def author = "Goran Ehrson"
     def authorEmail = "goran@technipelago.se"
     def description = '''\
 Override i18n messages in your database to allow sysadmins to modify labels, help texts, etc. in your application.
-This plugin is based on the 'i18n-db' plugin and adds Grails CRM multi-tenancy support.
-If you're not using Grails CRM please use i18n-db instead.
+This plugin is based on the 'i18n-db' plugin and adds GR8 CRM multi-tenancy support.
+If you're not using GR8 CRM please use i18n-db instead.
 '''
 
     def documentation = "http://grails.org/plugin/crm-i18n"
