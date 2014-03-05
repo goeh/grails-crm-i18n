@@ -143,6 +143,7 @@ class CrmMessageController {
         if (crmMessage) {
             try {
                 def tmp = crmMessage.toString()
+                crmMessageService.removeFromCache(crmMessage)
                 crmMessage.delete(flush: true)
                 flash.warning = "${message(code: 'crmMessage.deleted.message', args: [message(code: 'crmMessage.label', default: 'Message'), tmp])}"
                 redirect(action: "list")
