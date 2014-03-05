@@ -20,6 +20,7 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import grails.plugins.crm.core.TenantUtils
+import org.springframework.cache.Cache
 
 /**
  * i18n message service.
@@ -27,42 +28,63 @@ import grails.plugins.crm.core.TenantUtils
 class CrmMessageService {
 
     def grailsApplication
-    def messageCache
+    def grailsCacheManager
+
+    private CrmMessage getMessage(String key, Locale locale = null) {
+        def tenant = TenantUtils.tenant
+        def localeName = locale ? locale.toString() : null
+
+        CrmMessage.createCriteria().get() {
+            eq('tenantId', tenant)
+            if (localeName) {
+                eq('locale', localeName)
+            } else {
+                isNull('locale')
+            }
+            eq('code', key)
+            cache true
+        }
+    }
+
+    private String getCacheKey(String key, Locale locale) {
+        "${TenantUtils.tenant}${key}${locale ?: ''}"
+    }
+
+    void removeFromCache(String key, Locale locale = null) {
+        Cache messageCache = grailsCacheManager.getCache(CrmMessageSource.CRM_MESSAGE_CACHE)
+        messageCache.evict(getCacheKey(key, locale))
+    }
 
     void removeFromCache(CrmMessage message) {
-        if (messageCache) {
-            messageCache.removeAll() // TODO remove only the updated message from cache.
+        TenantUtils.withTenant(message.tenantId) {
+            removeFromCache(message.code, message.localeInstance)
+        }
+    }
+
+    void setMessage(String key, String value, Locale locale = null) {
+        def msg = getMessage(key, locale)
+        if (value == '-') {
+            msg?.delete() // Dash/minus removes an existing key
+        } else {
+            if (msg) {
+                msg.text = value
+            } else {
+                def tenant = TenantUtils.tenant
+                def localeName = locale ? locale.toString() : null
+                msg = new CrmMessage(tenantId: tenant, locale: localeName, code: key, text: value)
+            }
+            if(msg.save()) {
+                removeFromCache(msg)
+            }
         }
     }
 
     Properties updateProperties(Properties props, Locale locale = null) {
-        def tenant = TenantUtils.tenant
-        def localeName = locale ? locale.toString() : null
-        props.each {key, value ->
-            def msg = CrmMessage.createCriteria().get() {
-                eq('tenantId', tenant)
-                if (localeName) {
-                    eq('locale', localeName)
-                } else {
-                    isNull('locale')
-                }
-                eq('code', key)
-            }
-            if (value == '-') {
-                msg?.delete() // Dash/minus removes an existing key
-            } else {
-                if (msg) {
-                    msg.text = value
-                } else {
-                    msg = new CrmMessage(tenantId: tenant, locale: localeName, code: key, text: value)
-                }
-                msg.save()
-            }
+        props.each { key, value ->
+            setMessage(key, value, locale)
         }
 
-        if (messageCache) {
-            messageCache.removeAll() // TODO remove only the updated messages from cache.
-        }
+        grailsCacheManager.getCache(CrmMessageSource.CRM_MESSAGE_CACHE).clear()
 
         getProperties(locale)
     }
@@ -79,7 +101,7 @@ class CrmMessageService {
             }
         }
         def props = new Properties()
-        for(msg in result) {
+        for (msg in result) {
             props.setProperty(msg.code, msg.text)
         }
         return props
@@ -117,7 +139,7 @@ class CrmMessageService {
             file = File.createTempFile(filename, ".zip")
             ZipOutputStream zos = new ZipOutputStream(file.newOutputStream())
 
-            messages.each {lang, props ->
+            messages.each { lang, props ->
                 def name = filename
                 if (lang) {
                     name += ('_' + lang)
@@ -136,7 +158,7 @@ class CrmMessageService {
                 filename = filename + '_' + lang
             }
             file = File.createTempFile(filename, ".properties")
-            file.withOutputStream {out ->
+            file.withOutputStream { out ->
                 props.store(out, "Messages ${lang ? 'for locale ' + lang : ''} exported from $appName")
             }
         }

@@ -24,6 +24,16 @@ import grails.plugins.crm.core.TenantUtils
 class CrmMessageTests extends GroovyTestCase {
 
     def crmMessageService
+    def messageSource
+
+    void testUpdateMessages() {
+        def locale = new Locale("sv", "SE")
+        TenantUtils.withTenant(1) {
+            assert messageSource.getMessage('crmMessage.label', [] as Object[], locale) == 'Systemtext'
+            crmMessageService.setMessage('crmMessage.label', 'Applikationstext', locale)
+            assert messageSource.getMessage('crmMessage.label', [] as Object[], locale) == 'Applikationstext'
+        }
+    }
 
     void testExportImport() {
         def value = "Räksmörgås is Swedish for \"shrimp sandwich\" and the word contains all the crazy umlauts"
