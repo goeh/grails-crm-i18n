@@ -35,7 +35,7 @@ class CrmI18nGrailsPlugin {
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
     def groupId = "grails.crm"
-    def version = "1.2.1"
+    def version = "1.2.2"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmCore']
@@ -43,7 +43,7 @@ class CrmI18nGrailsPlugin {
             "grails-app/views/error.gsp"
     ]
     def title = "GR8 CRM Dynamic i18n"
-    def author = "Goran Ehrson"
+    def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
     def description = '''\
 Override i18n messages in your database to allow sysadmins to modify labels, help texts, etc. in your application.

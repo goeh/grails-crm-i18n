@@ -35,11 +35,26 @@ class CrmMessageTests extends GroovyTestCase {
         }
     }
 
+    void testCopyMessage() {
+        def locale = new Locale("sv", "SE")
+        TenantUtils.withTenant(2) {
+            crmMessageService.setMessage('crmMessage.label', 'Copy Me!', locale)
+            assert messageSource.getMessage('crmMessage.label', [] as Object[], locale) == 'Copy Me!'
+        }
+        TenantUtils.withTenant(3) {
+            assert messageSource.getMessage('crmMessage.label', [] as Object[], locale) == 'Systemtext'
+        }
+        crmMessageService.copyMessages(2, 3)
+        TenantUtils.withTenant(3) {
+            assert messageSource.getMessage('crmMessage.label', [] as Object[], locale) == 'Copy Me!'
+        }
+    }
+
     void testExportImport() {
         def value = "Räksmörgås is Swedish for \"shrimp sandwich\" and the word contains all the crazy umlauts"
         def file
-        TenantUtils.withTenant(1) {
-            def msg = new CrmMessage(tenantId: TenantUtils.tenant, locale: "sv", code: "test.integration.shrimp",
+        TenantUtils.withTenant(4) {
+            new CrmMessage(tenantId: TenantUtils.tenant, locale: "sv", code: "test.integration.shrimp",
                     text: value).save(failOnError: true, flush: true)
             file = crmMessageService.exportToFile()
         }
@@ -47,21 +62,21 @@ class CrmMessageTests extends GroovyTestCase {
         def text = file.text
         assert text.length() > 200 && text.length() < 210 // was 205 bytes on my machine.
 
-        TenantUtils.withTenant(1) {
-            file.withInputStream {is ->
+        TenantUtils.withTenant(4) {
+            file.withInputStream { is ->
                 crmMessageService.importText(is, new Locale("no"))
             }
         }
 
-        assert CrmMessage.findByCodeAndLocaleAndTenantId("test.integration.shrimp", "no", 1)?.text == value
+        assert CrmMessage.findByCodeAndLocaleAndTenantId("test.integration.shrimp", "no", 4)?.text == value
 
-        TenantUtils.withTenant(2) {
-            file.withInputStream {is ->
+        TenantUtils.withTenant(5) {
+            file.withInputStream { is ->
                 crmMessageService.importText(is, new Locale("sv"))
             }
         }
 
-        assert CrmMessage.findByCodeAndLocaleAndTenantId("test.integration.shrimp", "sv", 2)?.text == value
+        assert CrmMessage.findByCodeAndLocaleAndTenantId("test.integration.shrimp", "sv", 5)?.text == value
 
         file.delete()
 

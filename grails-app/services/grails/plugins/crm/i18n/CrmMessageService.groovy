@@ -46,19 +46,18 @@ class CrmMessageService {
         }
     }
 
-    private String getCacheKey(String key, Locale locale) {
-        "${TenantUtils.tenant}${key}${locale ?: ''}"
+    private String getCacheKey(Long tenant, String key, Locale locale) {
+        "${tenant}${key}${locale ?: ''}"
     }
 
     void removeFromCache(String key, Locale locale = null) {
         Cache messageCache = grailsCacheManager.getCache(CrmMessageSource.CRM_MESSAGE_CACHE)
-        messageCache.evict(getCacheKey(key, locale))
+        messageCache.evict(getCacheKey(TenantUtils.tenant, key, locale))
     }
 
     void removeFromCache(CrmMessage message) {
-        TenantUtils.withTenant(message.tenantId) {
-            removeFromCache(message.code, message.localeInstance)
-        }
+        Cache messageCache = grailsCacheManager.getCache(CrmMessageSource.CRM_MESSAGE_CACHE)
+        messageCache.evict(getCacheKey(message.tenantId, message.code, message.localeInstance))
     }
 
     void setMessage(String key, String value, Locale locale = null) {
@@ -73,7 +72,7 @@ class CrmMessageService {
                 def localeName = locale ? locale.toString() : null
                 msg = new CrmMessage(tenantId: tenant, locale: localeName, code: key, text: value)
             }
-            if(msg.save()) {
+            if (msg.save()) {
                 removeFromCache(msg)
             }
         }
@@ -107,13 +106,53 @@ class CrmMessageService {
         return props
     }
 
-    File exportToFile(String filename = null) {
-
-        def result = CrmMessage.createCriteria().list {
-            eq('tenantId', TenantUtils.tenant)
+    /**
+     * Get all customized messages in a tenant.
+     * @param tenant
+     * @return List of CrmMessage instances
+     */
+    List<CrmMessage> getMessages(Number tenant) {
+        CrmMessage.createCriteria().list {
+            eq('tenantId', tenant.longValue())
             order 'locale', 'asc'
             order 'code', 'asc'
         }
+    }
+
+    /**
+     * Copy all customized messages from one tenant to another.
+     * @param from tenant to copy from
+     * @param to tenant to copy to
+     * @param overwrite if message exists in destination, overwrite with source message if this param is true
+     * @return number of messages inserted into the destination tenant
+     */
+    int copyMessages(Number from, Number to, Boolean overwrite = false) {
+        def result = getMessages(from)
+        int i = 0
+        for (m in result) {
+            def msg = CrmMessage.createCriteria().get() {
+                eq('tenantId', to.longValue())
+                if (m.locale) {
+                    eq('locale', m.locale)
+                } else {
+                    isNull('locale')
+                }
+                eq('code', m.code)
+            }
+            if (!msg) {
+                msg = new CrmMessage(tenantId: to, locale: m.locale, code: m.code, text: m.text).save(failOnError: true)
+                i++
+            } else if (overwrite) {
+                msg.text = m.text
+            }
+            removeFromCache(msg)
+        }
+        return i
+    }
+
+    File exportToFile(String filename = null) {
+
+        def result = getMessages(TenantUtils.tenant)
 
         if (!result) {
             return null
