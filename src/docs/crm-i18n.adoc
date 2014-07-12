@@ -1,0 +1,107 @@
+= GR8 CRM - i18n Plugin
+Göran Ehrsson <goran@technipelago.se>
+:toc:
+:numbered:
+:icons: font
+:imagesdir: ./images
+:source-highlighter: prettify
+:homepage: http://gr8crm.github.io
+:gr8crm: GR8 CRM
+:gr8source: https://github.com/goeh/grails-crm-i18n
+:license: This plugin is licensed with http://www.apache.org/licenses/LICENSE-2.0.html[Apache License version 2.0]
+
+== Introduction
+
+{gr8crm} is a set of http://www.grails.org/[Grails Web Application Framework]
+plugins that makes it easy to develop web applications with CRM functionality.
+
+=== Customer relationship management
+Customer relationship management (CRM) is a system for managing a company’s interactions with current and future customers.
+It involves using technology to organize, automate and synchronize sales, marketing, customer service, and technical support.
+http://en.wikipedia.org/wiki/Customer_relationship_management[Wikipedia]
+
+The {gr8crm} "Ecosystem" currently contains over 40 Grails plugins. For a complete list of plugins see http://gr8crm.github.io.
+
+Each {gr8crm} plugin defines a http://martinfowler.com/bliki/BoundedContext.html[Bounded Context]
+that focus on one specific domain, for example *contact*, *project* or *document*.
+
+== CRM i18n Plugin
+
+The +crm-i18n+ plugin installs a custom Spring *MessageSource* +grails.plugins.crm.i18n.CrmMessageSource+ that provide two main features.
+
+1. Messages can be stored in the database making it possible to override messages stored in property files in grails-app/i18n.
+2. During message lookup a few message key variants are used as fallback when the exact message key does not match.
+   This reduces the number of message keys needed in an application if it's possible to fall back to generic messages.
+
+=== Message key fallback
+
+The crm-i18n plugin implements a custom message lookup algorithm that makes it possible to reduce the number of message
+keys in message bundles (.properties files). The algorithm is best explained with an example:
+
+[source,html]
+----
+<g:message code="crmContact.button.save"/>
+----
+
+For the above message lookup CrmMessageSource tries with the following keys until a message is found.
+
+1. Database: *crmContact.button.save*
+2. Message Bundle: *crmContact.button.save*
+3. Database: crmContact.button.save.*label*
+4. Message Bundle: crmContact.button.save.*label*
+5. Database: *default*.button.save
+6. Message Bundle: *default*.button.save
+7. Database: *default*.button.save.*label*
+8. Message Bundle: *default*.button.save.*label*
+
+[NOTE]
+====
+As soon as a message is found it is cached to make future lookups faster.
+====
+
+This lookup strategy makes it possible to have generic messages for common texts, like button labels for *Save*, *Find*, *Delete*, etc.
+The *.gsp* can contain markup specifying a unique key for the save button *crmContact.button.save.label* but does
+not need to provide that key in the message bundle. Instead a generic *default.button.save.label = Save* can be
+provided by the application bundle or a common plugin.
+
+If you want to have a unique label in one specific application
+you can add the key *crmContact.button.save.label = Save Contact Information* in the application's message bundle.
+
+== Services
+
+The *crm-i18n* plugin provide a service called +CrmMessageService+.
+This service contains methods for retrieving and updating messages and also methods that import and exports messages.
+
+=== CrmMessageService
+
++void setMessage(String key, String value, Locale locale = null)+
+
+Updates the message specified by +key+ with the text +value+. The text will be updated in the database, not in the message bundle (.properties file).
+A +Locale+ instance can be specified to set the text for a specific language, otherwise the default server locale will be used.
+
+Example
+
+[source,groovy]
+----
+crmMessageService.setMessage('crmContact.number.label', 'Customer Id', Locale.ENGLISH)
+----
+
++int copyMessages(Number from, Number to, Boolean overwrite = false)+
+
+Copy customized messages from one tenant to another.
+
++File exportToFile(String filename = null)+
+
+Export all customized messages to a message bundle (.properties file).
+
++void importText(InputStream inputStream, Locale locale = null)+
+
+Import messages from a message bundle (.properties file) to the database.
+
+== License
+
+{license}
+
+== Source Code
+
+The source code for this plugin is available at {gr8source}
