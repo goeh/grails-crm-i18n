@@ -15,33 +15,4 @@ With CRM we mean features like:
 This plugin provides storage of i18n messages in the database.
 It is a clone of the *i18n-db* plugin customized for GR8 CRM and tenant aware.
 
-An admin UI is provided at <app-name>/crmMessage where you can add messages to the database that will override
-messages defined in property files.
-
-The plugin also has special fallback logic when it looks up messages.
-Example: If the specified key is `crmContact.button.save` it tries to find messages using the following keys:
-
-    <g:message code="crmContact.button.save"/>
-
-1. crmContact.button.save
-2. crmContact.button.save.label
-3. default.button.save
-4. default.button.save.label
-5. calls standard Spring message source using original key (crmContact.button.save)
-
-The plugin can use EhCache to cache messages retrieved from database (recommended).
-To enable caching, configure a bean named "messageCache" in resources.groovy
-
-Example:
-
-    import org.springframework.cache.ehcache.EhCacheFactoryBean
-
-    beans = {
-        messageCache(EhCacheFactoryBean) {
-            timeToLive = 3600
-            timeToIdle = 1800
-            maxElementsInMemory = 5000
-            eternal = false
-            overflowToDisk = false
-        }
-    }
+Read more about this plugin at [gr8crm.github.io](http://gr8crm.github.io/plugins/crm-i18n/crm-i18n.html)
