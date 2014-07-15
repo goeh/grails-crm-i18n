@@ -1,7 +1,7 @@
-grails.project.work.dir = "target"
+grails.project.class.dir = "target/classes"
+grails.project.test.class.dir = "target/test-classes"
+grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
-
-grails.project.repos.default = "crm"
 
 grails.project.dependency.resolution = {
     inherits("global") {}
@@ -10,7 +10,6 @@ grails.project.dependency.resolution = {
     repositories {
         grailsCentral()
         mavenCentral()
-        mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
     }
     dependencies {
         test "org.spockframework:spock-grails-support:0.7-groovy-2.0"
@@ -28,40 +27,10 @@ grails.project.dependency.resolution = {
             export = false
             exclude "spock-grails-support"
         }
-        test(":codenarc:0.19") { export = false }
+        test(":codenarc:0.21") { export = false }
         test(":code-coverage:1.2.7") { export = false }
         test(":cache:1.1.1") { export = false }
 
-        compile "grails.crm:crm-core:1.2.5"
+        compile "gr8crm:crm-core:2.0.0"
     }
 }
-
-codenarc {
-    reports = {
-        CrmXmlReport('xml') {
-            outputFile = 'target/CodeNarcReport.xml'
-            title = 'GR8 CRM CodeNarc Report'
-        }
-        CrmHtmlReport('html') {
-            outputFile = 'target/CodeNarcReport.html'
-            title = 'GR8 CRM CodeNarc Report'
-
-        }
-    }
-    properties = {
-        GrailsPublicControllerMethod.enabled = false
-        CatchException.enabled = false
-        CatchThrowable.enabled = false
-        ThrowException.enabled = false
-        ThrowRuntimeException.enabled = false
-        GrailsStatelessService.enabled = false
-        GrailsStatelessService.ignoreFieldNames = "dataSource,scope,sessionFactory,transactional,*Service,messageSource,grailsApplication,applicationContext,expose"
-    }
-    processTestUnit = false
-    processTestIntegration = false
-}
-
-coverage {
-    exclusions = ['**/radar/**']
-}
-
