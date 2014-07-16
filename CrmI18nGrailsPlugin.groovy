@@ -34,7 +34,7 @@ class CrmI18nGrailsPlugin {
     String baseDir = "grails-app/i18n"
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
-    def groupId = "gr8crm"
+    def groupId = ""
     def version = "2.0.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
@@ -51,7 +51,7 @@ This plugin is based on the 'i18n-db' plugin and adds GR8 CRM multi-tenancy supp
 If you're not using GR8 CRM please use i18n-db instead.
 '''
 
-    def documentation = "http://gr8crm.github.io/plugins/crm-i18n/crm-i18n.html"
+    def documentation = "http://gr8crm.github.io/plugins/crm-i18n/"
     def license = "APACHE"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-i18n/issues"]
