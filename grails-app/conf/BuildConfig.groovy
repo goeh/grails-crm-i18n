@@ -32,6 +32,6 @@ grails.project.dependency.resolution = {
 
         runtime(":cache:1.1.1") { export = false }
 
-        compile ":crm-core:2.0.0"
+        compile ":crm-core:2.0.2"
     }
 }
