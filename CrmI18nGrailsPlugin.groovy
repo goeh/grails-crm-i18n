@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Goran Ehrsson.
+ * Copyright 2014 Goran Ehrsson.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,9 +34,9 @@ class CrmI18nGrailsPlugin {
     String baseDir = "grails-app/i18n"
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
-    def groupId = "grails.crm"
-    def version = "1.4.0-SNAPSHOT"
-    def grailsVersion = "2.4 > *"
+    def groupId = ""
+    def version = "2.0.0"
+    def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmCore']
     def pluginExcludes = [
@@ -51,7 +51,7 @@ This plugin is based on the 'i18n-db' plugin and adds GR8 CRM multi-tenancy supp
 If you're not using GR8 CRM please use i18n-db instead.
 '''
 
-    def documentation = "http://grails.org/plugin/crm-i18n"
+    def documentation = "http://gr8crm.github.io/plugins/crm-i18n/"
     def license = "APACHE"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-i18n/issues"]
