@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Goran Ehrsson.
+ * Copyright 2015 Goran Ehrsson.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class CrmI18nGrailsPlugin {
     String watchedResources = "file:./${baseDir}/**/*.properties".toString()
 
     def groupId = ""
-    def version = "2.4.0-SNAPSHOT"
+    def version = "2.4.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmCore']
