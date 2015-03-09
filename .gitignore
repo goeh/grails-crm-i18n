@@ -13,3 +13,4 @@ stacktrace.log
 plugin.xml
 
 .DS_Store
+.gradle
